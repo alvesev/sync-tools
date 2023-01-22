@@ -31,4 +31,10 @@ deb:
 	fakeroot dpkg-buildpackage -b -us -uc # XXX - GPG sign?
 
 clean:
-	echo "INFO:${0}:pid=${$}: Nothing to be done for cleanup after this DEB package build."
+	rm -rf "${DIR_ORIGIN}/debian/sync-tools/"
+	rm -rf "${DIR_ORIGIN}/debian/.debhelper/"
+	rm -f  "${DIR_ORIGIN}/debian/files"
+	rm -f  "${DIR_ORIGIN}/debian/stamp-makefile-build"
+	rm -f  "${DIR_ORIGIN}/debian/stamp-makefile-install"
+	rm -f  "${DIR_ORIGIN}/debian/sync-tools.debhelper.log"
+	rm -f  "${DIR_ORIGIN}/debian/sync-tools.substvars"
