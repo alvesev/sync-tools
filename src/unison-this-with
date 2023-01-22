@@ -1,0 +1,160 @@
+#!/bin/bash
+
+#
+#  Copyright 2007-2023 Alex Vesev
+#
+#  This file is part of Sync Tools.
+#
+#  Sync Tools is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  Sync Tools is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with Sync Tools. If not, see <https://www.gnu.org/licenses/>.
+#
+##
+
+PS4="+:\${0}:\${LINENO}: "
+set -xeu
+
+declare -r dir_this="$( dirname "${0}" )"
+
+###
+##
+#
+
+declare -a unisonFastCheckOption=("-fastcheck" "false")
+
+if [ "${#}" -lt 1 ] || [ "${*}" != "${*/--help/}" ] ; then
+    cat "${0}" | egrep "([[:space:]]|\|)[\-]{1,2}[a-zA-Z0-9_\-]{1,})"
+    exit 1
+fi
+
+function assert_is_value {
+    local -r value="${1}"
+    if [[ "${value}" =~ --(.*)$ ]] || [ -z "${value}" ] ; then
+        echo "ERROR:${0}:${LINENO}: CLI argument '${arg_name}' can not have value '${value}'." >&2
+        exit 1
+    fi
+}
+
+while [ ${#} -gt 0 ] ; do
+    arg_name="${1}"
+    case "${arg_name}" in
+        --host|-h)  # A host to sync with.
+            arg_value="${2:-}"
+            assert_is_value "${arg_value}"
+            declare -r UNISON_CSTM_HOST_REMOTE="${arg_value}"
+            shift
+            ;;
+        --profile-name|-p)
+            arg_value="${2:-}"
+            assert_is_value "${arg_value}"
+            declare  profile_name="${arg_value}"
+            shift
+            ;;
+        --fast)
+            declare -a unisonFastCheckOption=("-fastcheck" "true")
+            ;;
+        *)
+            echo "ERROR:${0}:${LINENO}: Unknown CLI argument '${arg_name}'." >&2
+            exit 1
+    esac
+    shift
+done
+
+declare -ra unisonFastCheckOption=("${unisonFastCheckOption[@]}")
+declare -r  UNISON_CSTM_LOGIN="${USER}"
+declare -r  host_local="$( hostname )"
+
+declare -r profile_name_default="unison-at-${host_local^^}-with-${UNISON_CSTM_HOST_REMOTE^^}"
+declare -r profile_name="${profile_name:-$profile_name_default}"
+declare -r profile_template="${dir_this}/${profile_name}.profile-template"
+declare -r profile_file="${HOME}/.unison/${profile_name}.prf"
+
+
+###
+##
+#
+
+
+function confirm {
+    local -r host_local_name="${1}"
+    local -r host_remote_name="${2}"
+    local -r user_remote_name="${3}"
+    local -r user_local_name="$( whoami )"
+    set +x
+    read -p "REQUEST:$( basename "${0}" ):${LINENO}: Sync pair <${user_local_name}@${host_local_name}> <${user_remote_name}@${host_remote_name}>? "
+    set -x
+    if [ "${REPLY,,}" == "yes" ] || [ "${REPLY,,}" == "y" ] ; then
+        is_confirmed=0
+    else
+        is_confirmed=1
+    fi
+    return ${is_confirmed}
+}
+
+function validate_host_names {
+    local -r hst_donor="${1//.*}"  # Strip domain name.
+    local -r hst_acceptor="${2//.*}"  # Strip domain name.
+    local -r local_name="$( hostname )"
+
+    local -r local_name_short="${local_name//.*}"  # Strip domain name.
+
+    set -e
+    test -n "${hst_donor}"
+    test -n "${hst_acceptor}"
+    test -n "${local_name_short}"
+
+    if [ "${hst_donor}" != "${local_name_short}" ] ; then
+        exit 1
+    fi
+    if [ "${hst_donor}" == "${hst_acceptor}" ] ; then
+        exit 1
+    fi
+    return 0
+}
+
+
+function generate_profile {
+    local -r template="${1}"
+    local -r file="${2}"
+    local    content
+
+    set -e
+    test -f "${template}"
+    cp "${template}" "${file}"
+    sed -i "s#\${UNISON_CSTM_LOGIN}#${UNISON_CSTM_LOGIN}#g" "${file}"
+    sed -i "s#\${UNISON_CSTM_HOST_REMOTE}#${UNISON_CSTM_HOST_REMOTE}#g" "${file}"
+}
+
+
+function do_sync {
+    local -r targetProfile="${1}"
+    set -e
+    test -n "${targetProfile}"
+    time unison \
+        "${targetProfile}" \
+        -terse \
+        -diff "/usr/bin/icdiff" \
+        "${unisonFastCheckOption[@]}"
+}
+
+###
+##
+#
+
+validate_host_names "${host_local}" "${UNISON_CSTM_HOST_REMOTE}"
+confirm "${host_local}" "${UNISON_CSTM_HOST_REMOTE}" "${UNISON_CSTM_LOGIN}"
+generate_profile "${profile_template}" "${profile_file}"
+do_sync "${profile_name}"
+
+set +x
+echo "+:${0}:${LINENO}: Job done." >&2
+echo ""
