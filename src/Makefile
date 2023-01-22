@@ -21,6 +21,7 @@
 ##
 
 DIR_ORIGIN = .
+DIR_ARTIFACTS = ../artifacts
 
 all: install
 
@@ -29,6 +30,8 @@ install:
 
 deb:
 	fakeroot dpkg-buildpackage -b -us -uc # XXX - GPG sign?
+	mkdir "${DIR_ARTIFACTS}"
+	mv ../*.deb ../*.buildinfo ../*.changes "${DIR_ARTIFACTS}/"
 
 clean:
 	rm -rf "${DIR_ORIGIN}/debian/sync-tools/"
