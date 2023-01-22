@@ -1,0 +1,14 @@
+Source: sync-tools
+Section: main
+Priority: standart
+Maintainer: Alex Vesev <alex.vesev@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: https://github.com/alvesev
+
+Package: sync-tools
+Architecture: all
+Depends: unison, bash (>=4), icdiff
+Description: Sync Tools - some helpers and utilities to assist in FS synchronization.
+ Sync Tools - some helpers and utilities to assist in FS synchronization.
+

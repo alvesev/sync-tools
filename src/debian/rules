@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+
+#
+#  Copyright 2007-2023 Alex Vesev
+#
+#  This file is part of Sync Tools.
+#
+#  Sync Tools is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  Sync Tools is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with Sync Tools. If not, see <https://www.gnu.org/licenses/>.
+#
+##
+
+export DH_VERBOSE=1
+export DH_OPTIONS=-v
+
+# Directory ch.root, to be used while build.
+export DESTDIR=$(CURDIR)/debian/sync-tools
+
+export DEB_MAKE_INSTALL_TARGET=install
+
+# CDBS file source was: /usr/share/cdbs/1/rules/debhelper.mk
+include ./debian/debhelper.mk
+
+# CDBS file: include /usr/share/cdbs/1/class/makefile.mk
+include ./debian/cdbs-defaults/makefile.mk
