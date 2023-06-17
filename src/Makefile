@@ -30,7 +30,7 @@ install:
 
 deb:
 	fakeroot dpkg-buildpackage -b -us -uc # XXX - GPG sign?
-	mkdir "${DIR_ARTIFACTS}"
+	mkdir -p "${DIR_ARTIFACTS}"
 	mv ../*.deb ../*.buildinfo ../*.changes "${DIR_ARTIFACTS}/"
 
 clean:
