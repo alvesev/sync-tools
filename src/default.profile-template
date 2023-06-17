@@ -1,0 +1,36 @@
+root=/home/${UNISON_CSTM_LOGIN}/
+root=ssh://${UNISON_CSTM_HOST_REMOTE}///home/${UNISON_CSTM_LOGIN}/
+sshargs=-p 22
+
+###
+##  Dirs
+#
+
+path = Desktop
+
+###
+##  Files
+#
+
+path = .viminfo
+path = .vimrc
+
+###
+##  Ignorants
+#
+
+ignore = Path .ssh
+ignore = Regex \.trash.*
+ignore = Path .gnupg
+ignore = Path .pki
+ignore = Path .unison
+ignore = Path .Private
+ignore = Path .ecryptfs
+
+# Reg.exp. syntax:
+#    a * matches any sequence of characters not including / (and not beginning with ., when used at the beginning of a name)
+#    a ? matches any single character except / (and leading .)
+#    [xyz] matches any character from the set {x, y, z }
+#    {a,bb,ccc} matches any one of a, bb, or ccc.
+# regular expression patterns are "anchored":
+# they must match the whole path, not just a substring of the path.
