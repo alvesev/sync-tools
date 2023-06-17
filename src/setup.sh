@@ -29,6 +29,8 @@ function do_install {
     fi
 
     install --owner=root --group=root --mode=755 --verbose "${DIR_ORIGIN}/unison-this-with"  "${CHROOT}/usr/bin/unison-this-with"
+    install --owner=root --group=root --mode=755 --verbose --directory "${CHROOT}/usr/share/sync-tools/"
+    install --owner=root --group=root --mode=644 --verbose "${DIR_ORIGIN}/default.profile-template"  "${CHROOT}/usr/share/sync-tools/default.profile-template"
 }
 
 function do_remove {

@@ -1,3 +1,10 @@
+sync-tools (2) vanessa; urgency=low
+
+  * Configuration files processing.
+  * Minor improvements.
+
+ -- Alex Vesev <alex.vesev@gmail.com>  Sun, 17 Jun 2023 20:30:00 +0200
+
 sync-tools (1) vanessa; urgency=low
 
   * Initial release.

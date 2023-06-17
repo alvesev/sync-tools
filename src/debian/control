@@ -8,7 +8,7 @@ Homepage: https://github.com/alvesev
 
 Package: sync-tools
 Architecture: all
-Depends: unison, bash (>=4), icdiff
+Depends: unison, bash (>=4), icdiff, openssh-client
 Description: Sync Tools - some helpers and utilities to assist in FS synchronization.
  Sync Tools - some helpers and utilities to assist in FS synchronization.
 
